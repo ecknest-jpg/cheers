@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#171717">
+  <meta name="description" content="Your Personal Beer & Wine Journal">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>CHEERS — Your Personal Beer & Wine Journal</title>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div><div class="brand">CHEERS<span>•</span></div><div class="tagline">YOUR PERSONAL BEER & WINE JOURNAL</div></div>
+      <button class="avatar" id="backupQuick" aria-label="Back-up">↥</button>
+    </header>
+    <main id="app" aria-live="polite"></main>
+    <nav class="tabbar" aria-label="Hoofdnavigatie">
+      <button class="tab active" data-tab="home"><b>⌂</b><small>Home</small></button>
+      <button class="tab" data-tab="beer"><b>♜</b><small>Bier</small></button>
+      <button class="tab" data-tab="wine"><b>◒</b><small>Wijn</small></button>
+      <button class="tab add-tab" data-tab="add"><b>＋</b><small>Toevoegen</small></button>
+      <button class="tab" data-tab="taste"><b>★</b><small>Mijn smaak</small></button>
+    </nav>
+  </div>
+  <input type="file" id="importFile" accept="application/json,.json" hidden>
+  <script src="database.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
