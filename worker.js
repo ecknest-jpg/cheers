@@ -1,8 +1,8 @@
 export default {
   async fetch(request, env) {
     const origin = request.headers.get("Origin") || "";
-    const allowed = env.ALLOWED_ORIGIN || "*";
-    const corsOrigin = allowed === "*" || origin === allowed ? (allowed === "*" ? "*" : origin) : "null";
+    const allowed = env.ALLOWED_ORIGIN || "";
+    const corsOrigin = allowed && origin === allowed ? origin : "null";
     const headers = {
       "Access-Control-Allow-Origin": corsOrigin,
       "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -13,7 +13,7 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
     if (request.method !== "POST") return new Response(JSON.stringify({ error: "Use POST." }), { status: 405, headers });
     if (corsOrigin === "null") return new Response(JSON.stringify({ error: "Origin not allowed." }), { status: 403, headers });
-    if (!env.OPENAI_API_KEY) return new Response(JSON.stringify({ error: "AI service is not configured." }), { status: 503, headers });
+    if (!env.OPENAI_API_KEY || !allowed) return new Response(JSON.stringify({ error: "AI service is not configured. Set OPENAI_API_KEY and ALLOWED_ORIGIN." }), { status: 503, headers });
 
     try {
       const raw = await request.text();
