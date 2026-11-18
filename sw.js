@@ -21,7 +21,7 @@ self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   const isAppShell = url.origin === self.location.origin &&
-    (event.request.mode === "navigate" || /\\.(html|css|js|webmanifest)$/.test(url.pathname));
+    (event.request.mode === "navigate" || /\.(html|css|js|webmanifest)$/.test(url.pathname));
 
   if (isAppShell) {
     event.respondWith(
