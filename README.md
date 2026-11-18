@@ -22,3 +22,15 @@ Personal entries and photos are stored in this browser on this device. They are 
 
 ## Notes
 Vivino scores are entered manually in this first version. Automatic Vivino lookup is not included; it requires a supported and permitted data source.
+
+## Version 1.1 — AI label recognition
+The add-product screen can send a selected label photo to a separately hosted Cloudflare Worker. The worker calls the OpenAI Responses API and returns structured beer or wine label fields. The user must review the fields before saving.
+
+### Configure the AI service
+1. Create a Cloudflare Worker and deploy the contents of `worker.js`.
+2. In the Worker settings, add the secret `OPENAI_API_KEY` with your own OpenAI API key. Never put this key in the GitHub repository or browser app.
+3. Optionally set the variable `ALLOWED_ORIGIN` to `https://ecknest-jpg.github.io` to restrict browser calls to this GitHub Pages origin. The default is *.
+4. In CHEERS → Toevoegen, paste the Worker URL into “AI-herkenning endpoint”. This setting is stored locally in that browser.
+5. AI image requests are sent to OpenAI for processing. API usage may incur separate charges under the API account. Photo recognition requires an internet connection.
+
+The Worker uses `gpt-4.1-mini` by default. Set `OPENAI_MODEL` to another vision-capable model if desired. The AI returns only fields it can read; uncertain fields are left blank. Vivino lookup is intentionally not part of 1.1.
