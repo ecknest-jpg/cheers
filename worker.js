@@ -35,8 +35,8 @@ export default {
         additionalProperties: false
       };
       const prompt = type === "wine"
-        ? "Read this wine label. Extract only information clearly visible or confidently identifiable on the label. Return null for anything uncertain or absent. Do not guess. vintage and abv must be strings."
-        : "Read this beer label. Extract only information clearly visible or confidently identifiable on the label. Return null for anything uncertain or absent. Do not guess. abv must be a string.";
+        ? "Read this wine label. Extract only information clearly visible or confidently identifiable on the label. Return null for anything uncertain or absent. Do not guess. For abv, look carefully for alcohol by volume, Alc., alcohol vol. or a percentage such as 12.5% vol. Return only the numeric percentage as a string, without the % sign. vintage and abv must be strings."
+        : "Read this beer label. Extract only information clearly visible or confidently identifiable on the label. Return null for anything uncertain or absent. Do not guess. For abv, look carefully for alcohol by volume, Alc., alcohol vol. or a percentage such as 8.5% vol. Return only the numeric percentage as a string, without the % sign. abv must be a string.";
 
       const response = await fetch("https://api.openai.com/v1/responses", {
         method: "POST",
