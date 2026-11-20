@@ -16,3 +16,19 @@
 .item-with-photo>.score{position:absolute;right:16px;bottom:20px}
 .detail-card .item-photo img{object-fit:cover;object-position:center 38%}
 .detail-delete{margin:0 0 14px}
+
+
+/* CHEERS 1.2.2: etiketten groter en volledig bekijken */
+.item-photo-wide{height:clamp(230px,70vw,340px);background:#171614}
+.item-photo-wide img{object-fit:contain;object-position:center;background:#171614}
+.wine-mode .item-photo-wide{background:#e9dfd2}
+.wine-mode .item-photo-wide img{background:#e9dfd2}
+.detail-card .item-photo{height:300px!important;background:#171614}
+.detail-card .item-photo img{object-fit:contain!important;object-position:center!important;background:#171614}
+.wine-mode .detail-card .item-photo{background:#e9dfd2}
+.wine-mode .detail-card .item-photo img{background:#e9dfd2}
+.item-photo-wide img,.detail-card .item-photo img{cursor:zoom-in}
+.label-lightbox{position:fixed;inset:0;z-index:30;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;padding:42px 12px 18px}
+.label-lightbox img{max-width:100%;max-height:100%;object-fit:contain}
+.label-lightbox button{position:absolute;top:env(safe-area-inset-top,10px);right:16px;border:0;background:#292929;color:white;border-radius:50%;width:42px;height:42px;font-size:30px;line-height:1}
+.field input[list]{cursor:pointer}
