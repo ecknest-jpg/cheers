@@ -1,4 +1,4 @@
-const CACHE = "cheers-shell-v5";
+const CACHE = "cheers-shell-v6";
 const ASSETS = ["./", "./index.html", "./styles.css", "./database.js", "./app.js", "./manifest.webmanifest"];
 
 self.addEventListener("install", event => {
