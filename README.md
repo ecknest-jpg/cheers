@@ -40,3 +40,10 @@ The add-product screen can send a selected label photo to a separately hosted Cl
 5. AI image requests are sent to OpenAI for processing. API usage may incur separate charges under the API account. Photo recognition requires an internet connection.
 
 The Worker uses `gpt-4.1-mini` by default. Set `OPENAI_MODEL` to another vision-capable model if desired. The AI returns only fields it can read; uncertain fields are left blank. Vivino lookup is intentionally not part of 1.1.
+
+
+## Version 1.3.0 — external wine information
+- Wine detail pages can search the WineAPI catalog and save available rating, rating count, grape, region, body, acidity, intensity, description and critic scores to the local wine record.
+- WineAPI is an independent data source, not Vivino. Coverage and data completeness vary; missing values remain blank.
+- Configure the optional `WINEAPI_KEY` secret in the Cloudflare Worker. The free WineAPI plan currently documents 100 requests per day for personal use. Never place the key in browser code or GitHub.
+- The Cloudflare Worker proxies search and detail requests so the API key stays server-side.
