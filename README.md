@@ -47,3 +47,11 @@ The Worker uses `gpt-4.1-mini` by default. Set `OPENAI_MODEL` to another vision-
 - WineAPI is an independent data source, not Vivino. Coverage and data completeness vary; missing values remain blank.
 - Configure the optional `WINEAPI_KEY` secret in the Cloudflare Worker. The free WineAPI plan currently documents 100 requests per day for personal use. Never place the key in browser code or GitHub.
 - The Cloudflare Worker proxies search and detail requests so the API key stays server-side.
+
+
+## Version 1.4.0 — wijngegevens en smaakprofiel
+- Druivensoort is nu een echte keuzelijst met rode en witte druiven.
+- WineAPI-zoekresultaten worden als kandidaten getoond. CHEERS kiest niet langer automatisch de eerste zoekmatch; controleer naam, wijnhuis, jaargang en regio en laad daarna bewust de juiste kandidaat.
+- Per wijn kun je een eigen smaakprofiel instellen op vijf niveaus: droog–zoet, frisheid, licht–vol, strak–rond, tannines en smaakintensiteit.
+- WineAPI levert alleen velden die in zijn catalogus beschikbaar zijn. Een gevonden wijn garandeert geen score of smaakdata.
+- Vivino heeft geen officiële openbare ontwikkelaars-API. CHEERS haalt daarom niet automatisch Vivino-scores op en gebruikt geen ongeautoriseerde scraping. Vivino-score kan handmatig worden ingevoerd. Een eventuele automatische koppeling vereist een passende, toegestane externe datadienst.
