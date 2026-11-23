@@ -36,3 +36,27 @@
 
 /* CHEERS 1.3.0 external wine data */
 .external-wine{margin:18px 0;padding:15px;border:1px solid var(--gold);border-radius:13px;background:#292319}.wine-mode .external-wine{background:#f4e9df;border-color:#c9a6a0}.external-wine>p{font-size:12px;line-height:1.5;color:var(--muted)}.wine-mode .external-wine>p{color:var(--wine-muted)}.external-title{display:flex;justify-content:space-between;gap:8px;align-items:center}.external-title b{font:17px Georgia;color:var(--gold)}.wine-mode .external-title b{color:var(--wine)}.external-title span,.source-note{font-size:10px;color:var(--muted)}.external-rating{font:30px Georgia;color:var(--gold);margin:10px 0}.wine-mode .external-rating{color:var(--wine)}.external-rating small,.external-rating span{font:11px -apple-system,sans-serif;color:var(--muted)}.taste-row{display:grid;grid-template-columns:105px 1fr 45px;align-items:center;gap:8px;margin:12px 0;font-size:11px}.taste-row b{text-align:right;color:var(--gold)}.wine-mode .taste-row b{color:var(--wine)}.taste-track{height:7px;border-radius:8px;background:rgba(130,120,105,.2);overflow:hidden}.taste-track i{display:block;height:100%;background:var(--gold);border-radius:8px}.wine-mode .taste-track i{background:var(--wine)}.external-scores{font-size:12px;line-height:1.8;margin:12px 0}.external-description{font-size:12px;line-height:1.5}.source-note{display:block;margin:12px 0}.wine-lookup-status{font-size:11px;line-height:1.4;margin-top:9px;color:var(--muted)}.wine-mode .wine-lookup-status{color:var(--wine-muted)}.external-wine button{margin-top:8px}
+
+/* CHEERS 1.4.0 wine controls and tasting profile */
+.wine-mode .field select{appearance:auto;min-height:48px;font-size:15px}
+.wine-mode .taste-edit-toggle{margin:10px 0 0;color:var(--wine);border-color:#d9c8b8}
+.taste-editor{margin-top:12px;padding:14px;border:1px solid #dfd1c2;border-radius:12px;background:#fffaf2}
+.taste-editor[hidden]{display:none}
+.taste-editor .field select{background:#fff;color:var(--ink);border:1px solid #dfd1c2;border-radius:9px;padding:12px;width:100%}
+.profile-input{margin:13px 0}
+.profile-input label{display:block;font-size:13px;font-weight:650;color:var(--ink);margin-bottom:5px}
+.profile-input>div{display:flex;align-items:center;gap:10px}
+.profile-input input{flex:1;accent-color:var(--wine)}
+.profile-input output{min-width:34px;text-align:right;color:var(--wine);font-weight:700}
+.taste-profile{margin:16px 0;padding:14px;background:#fffaf2;border:1px solid #e2d6c8;border-radius:12px}
+.taste-profile h3{font:18px Georgia;margin:0 0 12px;color:var(--wine)}
+.profile-axis{margin:12px 0}
+.profile-label{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--ink);margin-bottom:5px;text-transform:capitalize}
+.profile-label b{color:var(--wine)}
+.profile-scale{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px;font-size:10px;color:var(--wine-muted)}
+.profile-scale i{height:8px;border-radius:9px;background:#eadbd4;overflow:hidden}
+.profile-scale em{display:block;height:100%;background:var(--wine);border-radius:9px}
+#wineCandidates{margin-top:12px}
+#wineCandidates label{display:block;font-size:12px;font-weight:700;margin-bottom:7px;color:var(--wine)}
+#wineCandidates select{width:100%;padding:12px;border-radius:9px;border:1px solid #d9c8b8;background:#fff;color:var(--ink);font-size:14px;margin-bottom:8px}
+#wineCandidates button{margin-top:6px}
