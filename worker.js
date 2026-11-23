@@ -13,12 +13,29 @@ export default {
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
     if (request.method !== "POST") return new Response(JSON.stringify({ error: "Use POST." }), { status: 405, headers });
     if (corsOrigin === "null") return new Response(JSON.stringify({ error: "Origin not allowed." }), { status: 403, headers });
-    if (!env.OPENAI_API_KEY || !allowed) return new Response(JSON.stringify({ error: "AI service is not configured. Set OPENAI_API_KEY and ALLOWED_ORIGIN." }), { status: 503, headers });
+    if (!allowed) return new Response(JSON.stringify({ error: "Set ALLOWED_ORIGIN in Worker settings." }), { status: 503, headers });
 
     try {
       const raw = await request.text();
       if (raw.length > 2_500_000) return new Response(JSON.stringify({ error: "Image request is too large." }), { status: 413, headers });
       const body = JSON.parse(raw);
+      if (body.action === "wine-search" || body.action === "wine-detail") {
+        if (!env.WINEAPI_KEY) return new Response(JSON.stringify({ error: "WineAPI is not configured. Add the WINEAPI_KEY secret in Cloudflare." }), { status: 503, headers });
+        let url;
+        if (body.action === "wine-search") {
+          const query = String(body.query || "").trim().slice(0, 160);
+          if (query.length < 2) return new Response(JSON.stringify({ error: "Enter at least two characters to search." }), { status: 400, headers });
+          url = "https://api.wineapi.io/wines/search?q=" + encodeURIComponent(query) + "&limit=8&offset=0";
+        } else {
+          const id = String(body.id || "");
+          if (!/^[0-9a-f-]{36}$/i.test(id)) return new Response(JSON.stringify({ error: "Invalid wine record ID." }), { status: 400, headers });
+          url = "https://api.wineapi.io/wines/" + encodeURIComponent(id);
+        }
+        const wineResponse = await fetch(url, { headers: { "X-API-Key": env.WINEAPI_KEY, "Accept": "application/json" } });
+        const wineText = await wineResponse.text();
+        return new Response(wineText, { status: wineResponse.status, headers });
+      }
+      if (!env.OPENAI_API_KEY) return new Response(JSON.stringify({ error: "AI service is not configured. Add OPENAI_API_KEY in Cloudflare." }), { status: 503, headers });
       const type = body.type === "wine" ? "wine" : body.type === "beer" ? "beer" : null;
       if (!type || typeof body.image !== "string" || !/^data:image\/(jpeg|jpg|png|webp);base64,/.test(body.image)) {
         return new Response(JSON.stringify({ error: "Provide a beer or wine type and a JPEG, PNG, or WebP image." }), { status: 400, headers });
