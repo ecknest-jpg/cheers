@@ -1,4 +1,4 @@
-const APP_VERSION="1.4.0";
+const APP_VERSION="1.4.1";
 const app=document.getElementById("app");
 let currentTab="home",currentType="beer",activeFilter="all",searchTerm="",selectedProduct=null;
 const $=(s,r=document)=>r.querySelector(s);
