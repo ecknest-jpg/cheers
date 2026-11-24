@@ -34,21 +34,39 @@ function renderExternalWine(p){
  const rows=[["Volheid","body"],["Frisheid / zuren","acidity"],["Intensiteit","elaborate"]].map(([label,key])=>{const v=taste[key];if(v===null||v===undefined||v==="")return "";const n=Number(v);const meter=Number.isFinite(n)&&n>=0&&n<=5?'<div class="taste-track"><i style="width:'+(n/5*100)+'%"></i></div>':"";return '<div class="taste-row"><span>'+label+'</span>'+meter+'<b>'+esc(v)+(meter?"/5":"")+'</b></div>'}).join("");
  return base+(x.averageRating!=null?'<div class="external-rating">'+esc(x.averageRating)+' <small>/ 5</small> <span>'+(x.ratingsCount?esc(x.ratingsCount)+' beoordelingen':"")+'</span></div>':'<p>Geen externe totaalscore beschikbaar.</p>')+(x.grapes&&x.grapes.length?'<p><b>Druiven:</b> '+esc(x.grapes.map(g=>g.name||g).join(", "))+'</p>':"")+(x.region&&x.region.name?'<p><b>Regio:</b> '+esc(x.region.name)+(x.region.country?', '+esc(x.region.country):"")+'</p>':"")+rows+(x.description?'<p>'+esc(x.description)+'</p>':"")+(x.scores&&x.scores.length?'<div class="external-scores"><b>Criticusbeoordelingen</b>'+x.scores.slice(0,5).map(s=>'<div>'+esc(s.reviewer||"Bron")+": "+esc(s.scoreText||s.score||"—")+'</div>').join("")+'</div>':"")+'<small class="source-note">Bron: WineAPI. Dit is geen Vivino-score; beschikbaarheid verschilt per wijn.</small><button class="secondary" id="wineLookupBtn">Andere match zoeken</button><div id="wineCandidates"></div><div id="wineLookupStatus" class="wine-lookup-status"></div></div>';
 }
+function normalizeWineText(value){
+ return String(value||"").normalize("NFD").replace(/[\\u0300-\\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+}
 async function lookupExternalWine(){
  const p=CheersDB.product(selectedProduct);if(!p||p.type!=="wine")return;
- const status=$("#wineLookupStatus"),btn=$("#wineLookupBtn");if(btn){btn.disabled=true;btn.textContent="Zoeken…"}if(status)status.textContent="Zoeken in WineAPI…";
+ const status=$("#wineLookupStatus"),btn=$("#wineLookupBtn");if(btn){btn.disabled=true;btn.textContent="Zoeken…"}if(status)status.textContent="Gericht zoeken op wijnnaam…";
  try{
-  const query=[p.name,p.winery,p.vintage].filter(Boolean).join(" ");
+  // WineAPI documents q as a search by wine name, winery or appellation.
+  // Do not concatenate vintage/region into q: that produced unrelated fuzzy matches.
+  const query=p.name;
   const search=await fetch("https://cheers-label-ai.ecknest.workers.dev",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"wine-search",query})});
   const sr=await search.json();if(!search.ok)throw new Error(sr.error||"Zoeken is niet gelukt.");
-  const results=Array.isArray(sr.results)?sr.results:[];if(!results.length)throw new Error("Geen overeenkomst gevonden in WineAPI.");
-  const candidates=results.map(r=>({id:r.id,name:r.name||"Naam onbekend",winery:r.winery?.name||r.winery||"",vintage:r.vintage||"",region:r.region?.name||r.region||"",country:r.country||r.region?.country||"",rating:r.averageRating,confidence:r.confidence})).filter(r=>r.id);
-  if(!candidates.length)throw new Error("WineAPI gaf geen bruikbare wijn-ID terug.");
+  const results=Array.isArray(sr.results)?sr.results:[];
+  const expectedVintage=String(p.vintage||"").trim();
+  const expectedRegion=normalizeWineText(p.region);
+  const expectedProducer=normalizeWineText(p.winery||p.name);
+  const producerTokens=expectedProducer.split(" ").filter(t=>t.length>2&&!["crianza","reserva","gran","vino","bodega","bodegas"].includes(t));
+  const candidates=results.map(r=>({id:r.id,name:r.name||"Naam onbekend",winery:r.winery?.name||r.winery||"",vintage:r.vintage||"",region:r.region?.name||r.region||"",country:r.country||r.region?.country||"",rating:r.averageRating,confidence:r.confidence})).filter(c=>{
+   if(!c.id)return false;
+   const searchable=normalizeWineText(c.name+" "+c.winery);
+   const matchingTokens=producerTokens.filter(token=>searchable.includes(token)).length;
+   if(producerTokens.length>=2&&matchingTokens<Math.min(2,producerTokens.length))return false;
+   if(expectedVintage&&String(c.vintage)!==expectedVintage)return false;
+   if(expectedRegion&&c.region&& !normalizeWineText(c.region).includes(expectedRegion))return false;
+   if(expectedRegion&&!c.region&&matchingTokens<Math.min(3,producerTokens.length))return false;
+   return true;
+  });
+  if(!candidates.length)throw new Error("Geen betrouwbare overeenkomst gevonden voor "+p.name+(expectedVintage?" ("+expectedVintage+")":"")+(p.region?" uit "+p.region:"")+". WineAPI lijkt deze wijn niet goed in de catalogus te hebben. Er worden bewust geen andere regio's getoond.");
   const box=$("#wineCandidates");
-  if(box){box.innerHTML='<label class="candidate-label" for="wineCandidateSelect">Kies zelf de juiste wijn</label><select id="wineCandidateSelect">'+candidates.map((c,i)=>'<option value="'+i+'">'+esc([c.name,c.winery,c.vintage,c.region,c.country].filter(Boolean).join(" · "))+(c.rating?' — '+esc(c.rating)+'/5':'')+'</option>').join("")+'</select><button class="secondary" id="loadWineCandidate">Haal gegevens van deze wijn op</button>';}
+  if(box){box.innerHTML='<label class="candidate-label" for="wineCandidateSelect">Mogelijke overeenkomsten — controleer de details</label><select id="wineCandidateSelect">'+candidates.map((c,i)=>'<option value="'+i+'">'+esc([c.name,c.winery,c.vintage,c.region,c.country].filter(Boolean).join(" · "))+(c.rating?' — '+esc(c.rating)+'/5':'')+'</option>').join("")+'</select><button class="secondary" id="loadWineCandidate">Haal gegevens van deze wijn op</button>';}
   window.cheersWineCandidates=candidates;
-  if(status)status.textContent="Controleer naam, wijnhuis en jaargang. Kies alleen een resultaat dat echt overeenkomt. WineAPI geeft ook een relevantiescore; die is geen garantie.";
- }catch(err){if(status)status.textContent=err.message;else alert(err.message)}finally{const b=$("#wineLookupBtn");if(b)b.disabled=false;if(b)b.textContent=p.externalWine?"Andere match zoeken":"Zoek wijninformatie"}
+  if(status)status.textContent="Alleen resultaten die passen bij naam, producent, jaargang en regio worden getoond.";
+ }catch(err){window.cheersWineCandidates=[];const box=$("#wineCandidates");if(box)box.innerHTML="";if(status)status.textContent=err.message;else alert(err.message)}finally{const b=$("#wineLookupBtn");if(b)b.disabled=false;if(b)b.textContent=p.externalWine?"Andere match zoeken":"Zoek wijninformatie"}
 }
 async function loadWineCandidate(){
  const p=CheersDB.product(selectedProduct),select=$("#wineCandidateSelect");if(!p||!select)return;
